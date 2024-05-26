@@ -1,0 +1,14 @@
+"Id";"Designator";"Footprint";"Quantity";"Designation";"Supplier and ref";
+1;"R1,R3,R2";"R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal";3;"10k";;;
+2;"U1";"DIP-8_W7.62mm_Socket_LongPads";1;"TL072";;;
+3;"Y1";"Crystal_HC49-4H_Vertical";1;"Crystal";;;
+4;"MuscleSensor_PowerInput1";"PinSocket_1x03_P2.54mm_Vertical";1;"Conn_01x03";;;
+5;"J1,J2";"PinSocket_1x20_P2.54mm_Vertical";2;"Conn_01x20";;;
+6;"Signal_Input1";"PinSocket_1x02_P2.54mm_Vertical";1;"Conn_01x02";;;
+7;"AD7705";"DIP-16_W7.62mm_LongPads";1;"Conn_02x08_Counter_Clockwise";;;
+8;"MuscleSensor_PowerInput2";"JST_EH_S3B-EH_1x03_P2.50mm_Horizontal";1;"Conn_01x03";;;
+9;"ServoOutput1";"JST_EH_B8B-EH-A_1x08_P2.50mm_Vertical";1;"Conn_01x08";;;
+10;"C2";"CP_Radial_D8.0mm_P3.80mm";1;"330uF";;;
+11;"U2";"TO-220-3_Vertical";1;"AMS1117-3.3";;;
+12;"C3";"C_Disc_D5.0mm_W2.5mm_P5.00mm";1;"10nF";;;
+13;"Power12V1";"JST_EH_B2B-EH-A_1x02_P2.50mm_Vertical";1;"Conn_01x02";;;
