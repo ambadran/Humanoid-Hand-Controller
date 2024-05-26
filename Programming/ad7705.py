@@ -61,8 +61,13 @@ DEFAULT_VREF = const(3.3)
 
 class AD770X():
     def __init__(self) :        
-        self.spi = SoftSPI(baudrate=SPEED, polarity=1, phase=1, sck=Pin(6), mosi=Pin(7), miso=Pin(4))
-        self.CS = Pin(27, Pin.OUT)
+        # RP2040 zero waveshare board
+        # self.spi = SoftSPI(baudrate=SPEED, polarity=1, phase=1, sck=Pin(6), mosi=Pin(7), miso=Pin(4))
+        # self.CS = Pin(27, Pin.OUT)
+
+        # raspberry pi pico board
+        self.spi = SoftSPI(baudrate=SPEED, polarity=1, phase=1, sck=Pin(6), mosi=Pin(3), miso=Pin(0))
+        self.CS = Pin(7, Pin.OUT)
 
         self.initChannel(CHN_AIN1)
 
