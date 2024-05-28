@@ -14,13 +14,13 @@ class MuscleIntensity:
     LOW = 1
     MEDIUM = 2
     HIGH = 3
-muscle_intensities_bounds = [(0, 9000), (9000, 12000), (12000, 15000), (15000, 40000)]
+muscle_intensities_bounds = [(0, 1000), (1000, 8000), (8000, 10000), (10000, 40000)]
     
 class Movement:
     '''
     A specific muscle movement consists of a specific muscle contractions in a specific order with specific intervals between each muscle contraction. 
     '''
-    MAXIMUM_NUM_INTENSITIES = 4
+    MAXIMUM_NUM_INTENSITIES = 3
     def __init__(self, muscle_intensities: tuple[MuscleIntensity], times: tuple[int]):
         '''
         muscle_intensities: the values that would be read in `times` periods
@@ -39,10 +39,11 @@ class Movement:
 
 class Finger:
     MINIMUM_DEGREE = 0
-    MAXIMUM_DEGREE = 180
+    MAXIMUM_DEGREE = 120
     def __init__(self, servo_pin: int, movement: Movement):
         self._servo = Servo(pin_id=servo_pin)
         self.movement = movement
+        self.contraction_off()
 
     @property
     def contraction_value(self):
@@ -86,6 +87,17 @@ class HumanoidHand:
         for finger in self.fingers:
             movements.append(finger.movement)
         return movements
+
+    def finger_test(self):
+        '''
+        tests each individual fingers
+        '''
+        for finger_ind in range(5):
+            print(f"Testing finger {finger_ind}:")
+            self.fingers[finger_ind].contraction_toggle()
+            time.sleep(1)
+            self.fingers[finger_ind].contraction_toggle()
+            time.sleep(1)
 
 class MuscleSensorStatus:
     PENDING_MUSCLE_ACTIVIITY ="PENDING_MUSCLE_ACTIVIITY" 
@@ -145,6 +157,7 @@ class MuscleSensor:
         self.current_time += MuscleSensor.MAXIMUM_SAMINGLING_TIME
 
         if len(self.muscle_intensities_order) == Movement.MAXIMUM_NUM_INTENSITIES:
+
             self.timer.deinit()
 
             self.__detected_movement_ind = self.match_detected_muscle_intensities_order()
@@ -161,6 +174,7 @@ class MuscleSensor:
         movement: Movement = self.muscle_movement_hashes.get(tuple(self.muscle_intensities_order), None)
 
         self.current_time = 0
+        self.last_muscle_intensities_order = self.muscle_intensities_order
         self.muscle_intensities_order = []
 
         return movement
@@ -177,25 +191,30 @@ class MuscleSensor:
 
 
 humanoid_hand = HumanoidHand((
-Finger( 0, Movement(                           
+# Finger( 0, Movement(                           
+Finger( 16, Movement(                           
     ( MuscleIntensity.HIGH, MuscleIntensity.MEDIUM, MuscleIntensity.LOW ),
     (         0,                      1,                      3 )) ),
 
-Finger( 1, Movement(                           
+# Finger( 1, Movement(                           
+Finger( 17, Movement(                           
     ( MuscleIntensity.LOW, MuscleIntensity.MEDIUM, MuscleIntensity.HIGH ),
     (         0,                      2,                      3         )) ),
 
-Finger( 2, Movement(                           
-    ( MuscleIntensity.MEDIUM, MuscleIntensity.MEDIUM, MuscleIntensity.MEDIUM,  MuscleIntensity.MEDIUM),
-    (         0,                      1,                      2,                          3)) ),
+# Finger( 2, Movement(                           
+Finger( 19, Movement(                           
+    ( MuscleIntensity.MEDIUM, MuscleIntensity.MEDIUM, MuscleIntensity.MEDIUM),
+    (         0,                      1,                      2)) ),
 
-Finger( 3, Movement(                           
-    ( MuscleIntensity.LOW, MuscleIntensity.LOW, MuscleIntensity.LOW,  MuscleIntensity.LOW),
-    (         0,                      1,                      2,                          3)) ),
+# Finger( 3, Movement(                           
+Finger( 18, Movement(                           
+    ( MuscleIntensity.LOW, MuscleIntensity.LOW, MuscleIntensity.LOW),
+    (         0,                      1,                      2)) ),
 
-Finger( 5, Movement(                           
-    ( MuscleIntensity.HIGH, MuscleIntensity.HIGH, MuscleIntensity.HIGH,  MuscleIntensity.HIGH),
-    (         0,                      1,                      2,                          3)) )
+# Finger( 5, Movement(                           
+Finger( 20, Movement(                           
+    ( MuscleIntensity.HIGH, MuscleIntensity.HIGH, MuscleIntensity.HIGH),
+    (         0,                      1,                      2)) )
 
 ))
 
@@ -218,6 +237,7 @@ def read_contraction_and_execute():
     while muscle.status == MuscleSensorStatus.READING_ORDER_IN_PROGRESS:
         print(f"{muscle.status}: Muscle Intensity: {muscle.muscle_intensities_order} @ time: {muscle.current_time} ", end=' \r')
 
+    print(f"{muscle.status}: Muscle Intensity: {muscle.last_muscle_intensities_order} @ time: {muscle.current_time} ", end=' \r')
     print()
 
     if muscle.status == MuscleSensorStatus.MOVEMENT_DETECTED:
