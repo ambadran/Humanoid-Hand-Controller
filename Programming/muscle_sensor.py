@@ -127,6 +127,54 @@ class MuscleSensor:
         self.__detected_movement_ind = None
         self.status: MuscleSensorStatus = MuscleSensorStatus.IDLE
 
+    def calibrate_muscle_intensity_ranges(self):
+        '''
+        calibration sequence:
+        1- ask user to relax for 3 seconds
+        2- ask user to do maximum muscle contraction
+        3- repeat 1 & 2 three times
+        '''
+        CALIBRATION_TIMES = 3
+
+        relaxed_intensities = []
+        contracted_intensities = []
+        dummy_contracted_intensities = []  # the maximum contraction happens for a few ms so the values must be filtered before adding them to the original list
+
+        for _ in range(CALIBRATION_TIMES):
+            print("Please start relax muscle for 3 seconds")
+            time.sleep(2)
+            deadline = time.ticks_add(time.ticks_ms(), 1000)
+            while time.ticks_diff(deadline, time.ticks_ms()) > 0:
+                value = ad.readADResultRaw()
+                print(f"Reading: {value}", end=' \r')
+                relaxed_intensities.append(value)
+
+            print(f"Avg Relaxed value: {sum(relaxed_intensities)/len(relaxed_intensities)}\n\n")
+
+            print("Please contract your muscle as much as possible")
+
+            deadline = time.ticks_add(time.ticks_ms(), 1000)
+            while time.ticks_diff(deadline, time.ticks_ms()) > 0:
+                value = ad.readADResultRaw()
+                print(f"Reading: {value}", end=' \r')
+                dummy_contracted_intensities.append(value)
+            contracted_intensities.append(max(dummy_contracted_intensities))
+
+            print(f"Maximum value read: {contracted_intensities[-1]}")
+
+        relaxed_value = int(sum(relaxed_intensities) / len(relaxed_intensities))
+        contracted_value = int(sum(contracted_intensities) / len(contracted_intensities))
+
+        print(f"\n\nFinal relaxed value: {relaxed_value}\nFinal contracted value: {contracted_value}\n\n")
+
+        divisions = contracted_value//10
+        v1 = relaxed_value + divisions*1
+        v2 = relaxed_value + divisions*4
+        v3 = relaxed_value + divisions*6
+        v4 = relaxed_value + divisions*10
+        global muscle_intensities_bounds
+        muscle_intensities_bounds = [(0, v1), (v1, v2), (v2, v3), (v3, v4)]
+
     def read_mucsle_intensity(self) -> MuscleIntensity:
         '''
         reading current AD value and translating it into a muscle intensity range value
