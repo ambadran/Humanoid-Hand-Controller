@@ -1,3 +1,5 @@
+# Humanoid-Hand-Controller
+
 Interfacing muscle sensor V2 using micropython code 
 
 (OPTIONAL BUT RECOMMENDED: Use AD7705 16-bit ADC to give more resolution and muscle activity range to play with)
