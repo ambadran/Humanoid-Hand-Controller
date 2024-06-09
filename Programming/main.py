@@ -27,7 +27,11 @@ def main():
 
             if button_pressed:
                 if time.ticks_diff(time.ticks_ms(), start) <= FIRST_COMMAND_DELAY_TIME:
-                    read_contraction_and_execute()
+
+                    # Keep reading untill the next sequence
+                    while True:
+                        read_contraction_and_execute()
+                        time.sleep(1)
 
                 elif time.ticks_diff(time.ticks_ms(), start) <= SECOND_COMMAND_DELAY_TIME:
                     muscle.calibrate_muscle_intensity_ranges()

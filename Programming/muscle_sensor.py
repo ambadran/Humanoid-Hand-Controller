@@ -59,7 +59,7 @@ class HumanoidHand:
     # ssd1306 display
     display = ssd1306.SSD1306_I2C(128, 64, I2C(1, scl=Pin(27), sda=Pin(26)))
  
-    def __init__(self, fingers: tuple[Finger]):
+    def __init__(self, fingers: tuple[Finger], full_palm_movement: Movement):
 
         if len(fingers) != 5:
             raise ValueError("finger tuple must be 5 values!")
@@ -70,6 +70,7 @@ class HumanoidHand:
         self.finger3 = fingers[2]
         self.finger4 = fingers[3]
         self.finger5 = fingers[4]
+        self.full_palm_movement = full_palm_movement
 
     def movement_tuple(self) -> tuple[Movement]:
         '''
@@ -79,6 +80,8 @@ class HumanoidHand:
         movements = []
         for finger in self.fingers:
             movements.append(finger.movement)
+
+        movements.append(self.full_palm_movement)
         return movements
 
     def finger_test(self):
@@ -91,6 +94,27 @@ class HumanoidHand:
             time.sleep(1)
             self.fingers[finger_ind].contraction_toggle()
             time.sleep(1)
+
+    def full_palm_contract(self):
+        '''
+        contracts all palm fingers
+        '''
+        for finger in self.fingers:
+            finger.contraction_full()
+
+    def full_palm_relax(self):
+        '''
+        contracts all palm fingers
+        '''
+        for finger in self.fingers:
+            finger.contraction_off()
+
+    def full_palm_toggle(self):
+        '''
+        toggle all palm fingers
+        '''
+        for finger in self.fingers:
+            finger.contraction_toggle()
 
 class MuscleSensorStatus:
     PENDING_ACTIVIITY = "PENDING_ACTIVIITY" 
@@ -348,7 +372,15 @@ Finger( 20, Movement(
     ( MuscleIntensity.MEDIUM, MuscleIntensity.NONE, MuscleIntensity.NONE),
     (         0,                      1,                      2)) )
 
-))
+    ),
+
+# full_palm_movement
+    Movement(
+        (MuscleIntensity.MEDIUM, MuscleIntensity.LOW, MuscleIntensity.NONE), 
+        (       0,                      1,                      2)
+        )
+
+    )
 
 movements = humanoid_hand.movement_tuple()
 MuscleSensorStatus.report_saved_movements(movements)
@@ -378,7 +410,11 @@ def read_contraction_and_execute():
 
         MuscleSensorStatus.report_custom(f"Index: {detected_movement_ind}", clear_display=False, line=36)
 
-        humanoid_hand.fingers[detected_movement_ind].contraction_toggle()
+        if detected_movement_ind < 5:
+            humanoid_hand.fingers[detected_movement_ind].contraction_toggle()
+
+        else:
+            humanoid_hand.full_palm_toggle()
 
     elif muscle.status == MuscleSensorStatus.MOVEMENT_INVALID:
         MuscleSensorStatus.report_status(muscle)
