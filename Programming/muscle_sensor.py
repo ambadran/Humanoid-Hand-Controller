@@ -124,6 +124,28 @@ class MuscleSensorStatus:
         time.sleep_us(100)
 
     @classmethod
+    def report_saved_movements(cls, movements: list[Movement]):
+        '''
+        prints the saved movements on the screen
+        '''
+        print(f"Defined Moves:")  # unfortionately can't display this and the 5 movement in the oled screen at once :(
+        for ind, movement in enumerate(movements):
+            MuscleSensorStatus.report_custom(f"M{ind+1}: {movement.muscle_intensities_order}", clear_display=False, line=ind*12)
+
+    @classmethod
+    def report_ad(cls):
+        '''
+        prints in terminal and ssd1306 the ad values
+        '''
+        global ad
+        ad_value = ad.readADResultRaw()
+        print(f"Reading: {ad_value}", end=' \r')
+        HumanoidHand.display.fill(0)
+        HumanoidHand.display.text(f"AD7705: {ad_value}", 0, 0, 1)
+        HumanoidHand.display.show()
+        time.sleep_us(100)
+
+    @classmethod
     def report_custom(cls, string, clear_display:bool=True, clear_line: bool=False, line: int=0, ending: str='\n'):
         '''
         display custome message in oled and terminal
@@ -176,6 +198,14 @@ class MuscleSensor:
         self.muscle_intensities_order: list[MuscleIntensity] = []  # list of muscle intensities detected
         self.__detected_movement_ind = None
         self.status: MuscleSensorStatus = MuscleSensorStatus.IDLE
+
+    def test_ad(self, seconds):
+        '''
+        prints ad values persistently for 'seconds' time
+        '''
+        for _ in range(seconds*10):
+            MuscleSensorStatus.report_ad()
+            time.sleep_ms(100)
 
     def calibrate_muscle_intensity_ranges(self):
         '''
@@ -321,9 +351,7 @@ Finger( 20, Movement(
 ))
 
 movements = humanoid_hand.movement_tuple()
-print(f"Defined Moves:")  # unfortionately can't display this and the 5 movement in the oled screen at once :(
-for ind, movement in enumerate(movements):
-    MuscleSensorStatus.report_custom(f"M{ind+1}: {movement.muscle_intensities_order}", clear_display=False, line=ind*12)
+MuscleSensorStatus.report_saved_movements(movements)
 
 print('\n')
 
