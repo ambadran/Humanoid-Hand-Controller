@@ -101,6 +101,7 @@ class HumanoidHand:
         '''
         for finger in self.fingers:
             finger.contraction_full()
+            time.sleep(2)
 
     def full_palm_relax(self):
         '''
@@ -115,6 +116,7 @@ class HumanoidHand:
         '''
         for finger in self.fingers:
             finger.contraction_toggle()
+            time.sleep(2)
 
 class MuscleSensorStatus:
     PENDING_ACTIVIITY = "PENDING_ACTIVIITY" 
